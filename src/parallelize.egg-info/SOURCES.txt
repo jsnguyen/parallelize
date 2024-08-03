@@ -1,0 +1,10 @@
+LICENSE
+README.md
+pyproject.toml
+setup.py
+src/parallelize/__init__.py
+src/parallelize/parallelize.py
+src/parallelize.egg-info/PKG-INFO
+src/parallelize.egg-info/SOURCES.txt
+src/parallelize.egg-info/dependency_links.txt
+src/parallelize.egg-info/top_level.txt
