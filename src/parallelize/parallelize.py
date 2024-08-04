@@ -1,24 +1,24 @@
+import time
 import multiprocess
 from functools import wraps
 from tqdm import tqdm
 
-def parallelize(iterator, pool_size=None, use_tqdm=False, enum=False):
-    def decorator(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            # Use multiprocessing.Pool to parallelize the tasks
-            with multiprocess.Pool(pool_size) as pool:
-                # Use starmap to pass multiple arguments to the function
-                if enum:
-                    arg_list = [(item,i) for i,item in enumerate(iterator)]
-                else:
-                    arg_list = [item for item in iterator]
+def parallelize(func=None, pool_size=None, use_tqdm=False, enum=False):
+    if func is None:
+        return lambda f: parallelize(f, pool_size=pool_size, use_tqdm=use_tqdm, enum=enum)
 
-                results = list(istarmap(pool, func, arg_list, iterable_len=len(arg_list), use_tqdm=use_tqdm))
+    @wraps(func)
+    def wrapper(iterator):
+        with multiprocess.Pool(pool_size) as pool:
+            if enum:
+                arg_list = [(item,i) for i,item in enumerate(iterator)]
+            else:
+                arg_list = [item for item in iterator]
 
-            return results
-        return wrapper
-    return decorator
+            res = list(istarmap(pool, func, arg_list, iterable_len=len(arg_list), use_tqdm=use_tqdm))
+
+        return res
+    return wrapper
 
 def istarmap(pool, func, iterable, chunksize=1, use_tqdm=False, iterable_len=None):
     """
@@ -38,10 +38,10 @@ def istarmap(pool, func, iterable, chunksize=1, use_tqdm=False, iterable_len=Non
     
     # Apply the function to the chunks
     if use_tqdm:
-        results = tqdm(pool.imap(func, iterable, chunksize), total=iterable_len)
+        res = tqdm(pool.imap(func, iterable, chunksize), total=iterable_len)
     else:
-        results = pool.imap(func, iterable, chunksize)
+        res = pool.imap(func, iterable, chunksize)
     
-    # Yield the results as they become available
-    for result in results:
+    # Yield the res as they become available
+    for result in res:
         yield result
