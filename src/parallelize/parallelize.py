@@ -26,10 +26,6 @@ def parallelize(func: function = None, n_threads: int = None, use_tqdm: bool = F
 
     @wraps(func)
     def wrapper(data: list):
-        '''
-        args:
-            data: a list of the data
-        '''
 
         with multiprocess.Pool(n_threads) as pool:
             if enum:
@@ -37,33 +33,29 @@ def parallelize(func: function = None, n_threads: int = None, use_tqdm: bool = F
             else:
                 arg_list = data
 
-            res = list(istarmap(pool, func, arg_list, iterable_len=len(arg_list), use_tqdm=use_tqdm))
+            res = list(istarmap(pool, func, arg_list, data_len=len(arg_list), use_tqdm=use_tqdm))
 
         return res
     return wrapper
 
-def istarmap(pool, func, iterable, chunksize=1, use_tqdm=False, iterable_len=None):
+def istarmap(pool, func: function, data: list, chunksize: int = 1, use_tqdm: bool = False, data_len: int = None):
     """
     function that combines of imap and starmap
 
     args:
         pool (multiprocessing.Pool): the pool of worker processes
         func (callable): the function to apply to the items
-        iterable (iterable): an iterable of argument tuples
-        chunksize (int, optional): the size of the chunks to split the iterable into
+        data (iterable): list of argument tuples
+        chunksize (int, optional): the size of the chunks to split the data into
     
     yields:
-        The results of the function applied to each item.
+        the results of the function applied to each item
     """
-    # Ensure the iterable is an iterator
-    iterable = iter(iterable)
-    
-    # Apply the function to the chunks
+
     if use_tqdm:
-        res = tqdm(pool.imap(func, iterable, chunksize), total=iterable_len)
+        res = tqdm(pool.imap(func, data, chunksize), total=data_len)
     else:
-        res = pool.imap(func, iterable, chunksize)
+        res = pool.imap(func, data, chunksize)
     
-    # Yield the res as they become available
     for result in res:
         yield result
