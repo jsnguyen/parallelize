@@ -1,7 +1,8 @@
 import os
 import time
-from parallelize import *
 from tqdm import tqdm
+
+from parallelize import *
 
 def main():
     data = [10**6] * 256 # make a list of tasks to calculate the sum of squares of a million, 256 times

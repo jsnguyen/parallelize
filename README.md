@@ -2,11 +2,18 @@
 
 This is a super simple package for adding decorators to parallelize your code easily. It is specifically designed for the case that you are running independent operations on an array of data.
 
-Example:
+## Installation
+
+```
+git clone [https://github.com/jsnguyen/parallelize](https://github.com/jsnguyen/parallelize)
+pip install -e parallelize
+```
+
+## Example
 
 Lets say you have the following for loop you want to parallelize:
 
-```
+``` python
 data = [10**6] * 256
 for el in data:
     res = sum(i * i for i in range(el))
@@ -16,13 +23,15 @@ On my computer, using a single thread, this takes ~8.5 seconds to run.
 
 To parallelize this, we wrap the contents of the `for` loop in a function and use the `parallelize` decorator:
 
-```
+``` python
 data = [10**6] * 256
 @parallelize
 def compute_heavy_task(val):
     res = sum(i * i for i in range(val))
     return res
 ```
+
+By default, it will use parallelize across all available cores on your system.
 
 `compute_heavy_task` now takes a list of values, rather than a single value. This list will be split amongst all the available threads. To run the parallelized version of the function:
 
@@ -32,4 +41,31 @@ res = compute_heavy_task(data)
 
 `res` will be an ordered list of the function applied to the data.
 
-See [examples.py](./tests/examples.py) for more examples.
+## Other Features
+
+It also supports `tqdm`:
+
+``` python
+@parallelize(use_tqdm=True)
+def compute_heavy_task(val):
+    res = sum(i * i for i in range(val))
+    return res
+```
+
+This will print a progressbar of the parallelized function
+
+If you need an index in your function, ie: your loop used `enumerate` you have to make sure your function now takes a tuple instead, with the second value in the tuple being the index:
+
+``` python
+for i,el in enumerate(data:)
+    res = sum(i * i for i in range(el))
+```
+Turns into
+
+``` python
+@parallelize(enum=True)
+def compute_heavy_task(val_tuple):
+    val, ii = val_tuple
+    res = sum(i * i for i in range(val))
+    return res
+```

@@ -1,10 +1,12 @@
 [project]
 name = "parallelize"
 version = "0.0.1"
+dependencies = [
+  "tqdm",
+  "multiprocess"
+]
+requires-python = ">= 3.8"
 
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[tool.hatch.metadata]
-allow-direct-references = true
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
