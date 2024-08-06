@@ -74,4 +74,4 @@ def compute_heavy_task(val_tuple):
 res = compute_heavy_task(data)
 ```
 
-See [./tests/examples.py](examples.py) for more verbose versions of these examples.
+See [examples.py](./tests/examples.py) for more verbose versions of these examples.
