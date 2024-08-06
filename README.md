@@ -1,6 +1,8 @@
 # parallelize
 
-This is a super simple package for adding decorators to parallelize your code easily. It is specifically designed for the case that you are running independent operations on an array of data. Uses the `multiprocess` package (instead of `multiprocessing`), which overcomes the serialization limitations of `pickle` by using `dill` instead.
+This is a super simple package for adding decorators to parallelize your code easily. It is specifically designed for the case that you are running independent operations on a list of data. E.g. I have a list of data that need to be processed in some kind of way. The processing of these frames are independent of each other, and can be done in parallel. This package is not for any complicated kind of parallel processing, just the simple case of easily parallelizable for loops that occur frequently in data analysis.
+
+Uses the `multiprocess` package (instead of `multiprocessing`), which overcomes the serialization limitations of `pickle` by using `dill` instead.
 
 ## Installation
 
@@ -10,6 +12,8 @@ pip install ./parallelize
 ```
 
 ## Example
+
+See [examples.py](./tests/examples.py) for more verbose versions of these examples.
 
 Lets say you have the following for loop you want to parallelize:
 
@@ -39,7 +43,7 @@ By default, it will use parallelize across all available cores on your system.
 res = compute_heavy_task(data)
 ```
 
-`res` will be an ordered list of the function applied to the data.
+This parallelized function takes only 0.5 seconds to run. `res` will be an ordered list of the function applied to the data.
 
 ## Other Features
 
@@ -73,5 +77,3 @@ def compute_heavy_task(val_tuple):
     return res
 res = compute_heavy_task(data)
 ```
-
-See [examples.py](./tests/examples.py) for more verbose versions of these examples.
