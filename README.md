@@ -7,7 +7,7 @@ Uses the `multiprocess` package (instead of `multiprocessing`), which overcomes 
 ## Installation
 
 ```
-git clone https://github.com/jsnguyen/parallelize
+git clone https://github.com/jsnguyen/parallelize.git
 pip install ./parallelize
 ```
 
