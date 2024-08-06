@@ -45,6 +45,10 @@ res = compute_heavy_task(data)
 
 This parallelized function takes only 0.5 seconds to run. `res` will be an ordered list of the function applied to the data.
 
+## Function Arguments
+
+Your function should only take one argument, an instance of the data being operated on. To avoid adding arguments to your function, define your function in line with the code so that it has access to all the local variables defined in your program.
+
 ## Other Features
 
 It also supports `tqdm`:
