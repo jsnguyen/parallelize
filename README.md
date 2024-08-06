@@ -25,7 +25,7 @@ for el in data:
 
 On my computer, using a single thread, this takes ~8.5 seconds to run.
 
-To parallelize this, we wrap the contents of the `for` loop in a function and use the `parallelize` decorator:
+To parallelize this, we wrap the contents of the for loop in a function and use the `parallelize` decorator:
 
 ``` python
 data = [10**6] * 256
@@ -61,7 +61,7 @@ This will print a progressbar of the parallelized function using `tqdm`.
 
 If you need an index in your function, ie: your loop used `enumerate` you have to make sure your function now takes a tuple instead, with the second value in the tuple being the index.
 
-This `for` loop:
+This for loop:
 
 ``` python
 for i,el in enumerate(data:)
