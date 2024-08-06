@@ -1,12 +1,12 @@
 # parallelize
 
-This is a super simple package for adding decorators to parallelize your code easily. It is specifically designed for the case that you are running independent operations on an array of data.
+This is a super simple package for adding decorators to parallelize your code easily. It is specifically designed for the case that you are running independent operations on an array of data. Uses the `multiprocess` package (instead of `multiprocessing`), which overcomes the serialization limitations of `pickle` by using `dill` instead.
 
 ## Installation
 
 ```
 git clone [https://github.com/jsnguyen/parallelize](https://github.com/jsnguyen/parallelize)
-pip install -e parallelize
+pip install ./parallelize
 ```
 
 ## Example
@@ -35,7 +35,7 @@ By default, it will use parallelize across all available cores on your system.
 
 `compute_heavy_task` now takes a list of values, rather than a single value. This list will be split amongst all the available threads. To run the parallelized version of the function:
 
-```
+``` python
 res = compute_heavy_task(data)
 ```
 
@@ -50,17 +50,20 @@ It also supports `tqdm`:
 def compute_heavy_task(val):
     res = sum(i * i for i in range(val))
     return res
+res = compute_heavy_task(data)
 ```
 
-This will print a progressbar of the parallelized function
+This will print a progressbar of the parallelized function using `tqdm`.
 
-If you need an index in your function, ie: your loop used `enumerate` you have to make sure your function now takes a tuple instead, with the second value in the tuple being the index:
+If you need an index in your function, ie: your loop used `enumerate` you have to make sure your function now takes a tuple instead, with the second value in the tuple being the index.
+
+This `for` loop:
 
 ``` python
 for i,el in enumerate(data:)
     res = sum(i * i for i in range(el))
 ```
-Turns into
+Turns into:
 
 ``` python
 @parallelize(enum=True)
@@ -68,4 +71,7 @@ def compute_heavy_task(val_tuple):
     val, ii = val_tuple
     res = sum(i * i for i in range(val))
     return res
+res = compute_heavy_task(data)
 ```
+
+See [./tests/examples.py](examples.py) for more verbose versions of these examples.
