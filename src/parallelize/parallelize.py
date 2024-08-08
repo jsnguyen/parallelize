@@ -28,7 +28,7 @@ def parallelize(func: function = None, n_threads: int = None, use_tqdm: bool = F
 
         with multiprocess.Pool(n_threads) as pool:
             if enum:
-                arg_list = [(el,i) for i,el in enumerate(data)]
+                arg_list = [(i,el) for i,el in enumerate(data)]
             else:
                 arg_list = data
 

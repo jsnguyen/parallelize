@@ -55,7 +55,7 @@ def main():
 
     @parallelize(n_threads=n_threads, use_tqdm=True, enum=True)
     def compute_heavy_task_with_enum(val_tuple):
-        val, ii  = val_tuple # add enum here
+        ii, val  = val_tuple # add enum here
         res = sum(i * i for i in range(val))
         return res
 
