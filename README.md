@@ -6,7 +6,7 @@ Uses the `multiprocess` package (instead of `multiprocessing`), which overcomes 
 
 ## Installation
 
-```
+``` bash
 git clone https://github.com/jsnguyen/parallelize.git
 pip install ./parallelize
 ```
@@ -71,6 +71,7 @@ This for loop:
 for i,el in enumerate(data:)
     res = sum(i * i for i in range(el))
 ```
+
 Turns into:
 
 ``` python
@@ -80,4 +81,29 @@ def compute_heavy_task(val_tuple):
     res = sum(i * i for i in range(val))
     return res
 res = compute_heavy_task(data)
+```
+
+## Known Issues
+
+If you get the error:
+
+```
+objc[28657]: +[__NSCFConstantString initialize] may have been in progress in another thread when fork() was called.
+objc[28657]: +[__NSCFConstantString initialize] may have been in progress in another thread when fork() was called. We cannot safely call it or ignore it in the fork() child process. Crashing instead. Set a breakpoint on objc_initializeAfterForkError to debug.
+```
+
+Seems to be an issue with parallelization on ARM-based Macs.
+
+Change the following environment variable to fix this:
+
+For bash:
+
+``` bash
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+```
+
+For fish:
+
+``` fish
+set -x OBJC_DISABLE_INITIALIZE_FORK_SAFETY YES
 ```
