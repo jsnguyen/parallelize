@@ -28,6 +28,7 @@ On my computer, using a single thread, this takes ~8.5 seconds to run.
 To parallelize this, we wrap the contents of the for loop in a function and use the `parallelize` decorator:
 
 ``` python
+from parallelize import parallelize
 data = [10**6] * 256
 @parallelize
 def compute_heavy_task(val):
@@ -54,6 +55,7 @@ Your function should only take one argument, an instance of the data being opera
 It also supports `tqdm`:
 
 ``` python
+from parallelize import parallelize
 @parallelize(use_tqdm=True)
 def compute_heavy_task(val):
     res = sum(i * i for i in range(val))
@@ -75,6 +77,7 @@ for i,el in enumerate(data:)
 Turns into:
 
 ``` python
+from parallelize import parallelize
 @parallelize(enum=True)
 def compute_heavy_task(val_tuple):
     val, ii = val_tuple
