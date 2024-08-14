@@ -34,19 +34,17 @@ data = [10**6] * 256
 def compute_heavy_task(val):
     res = sum(i * i for i in range(val))
     return res
-```
 
-By default, it will use parallelize across all available cores on your system.
-
-`compute_heavy_task` now takes a list of values, rather than a single value. This list will be split amongst all the available threads. To run the parallelized version of the function:
-
-``` python
 res = compute_heavy_task(data)
 ```
 
-This parallelized function takes only 0.5 seconds to run. `res` will be an ordered list of the function applied to the data.
+`compute_heavy_task` now takes a *list of values*, rather than a single value. This list will be split amongst all the available threads. The list in the original for loop becomes the argument of the new, parallelized function.
 
-## Function Arguments
+This parallelized function takes only 0.5 seconds to run and `res` will be an *ordered list* of the function applied to the data.
+
+By default, it will use all available cores on your system, but you can use the `n_threads` argument to set the number of threads.
+
+### Note On Function Arguments
 
 Your function should only take one argument, an instance of the data being operated on. To avoid adding arguments to your function, define your function in line with the code so that it has access to all the local variables defined in your program.
 
@@ -110,3 +108,5 @@ For fish:
 ``` fish
 set -x OBJC_DISABLE_INITIALIZE_FORK_SAFETY YES
 ```
+
+Add these lines to your `rc` file for persistence.
