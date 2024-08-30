@@ -2,8 +2,9 @@ import multiprocess
 from functools import wraps
 from tqdm import tqdm
 from types import FunctionType as function
+import copy
 
-def parallelize(func: function = None, n_threads: int = None, use_tqdm: bool = False, enum: bool = False):
+def parallelize(func: function = None, **kwargs):
     '''
     function or decorator that automatically parallelizes a function
 
@@ -20,24 +21,81 @@ def parallelize(func: function = None, n_threads: int = None, use_tqdm: bool = F
 
     '''
 
+    n_threads = kwargs.get('n_threads', None)
+    use_tqdm = kwargs.get('use_tqdm', False)
+    enum = kwargs.get('enum', False)
+    use_chunks = kwargs.get('use_chunks', False)
+    setup_func = kwargs.get('setup_func', None)
+
     if func is None:
-        return lambda f: parallelize(f, n_threads=n_threads, use_tqdm=use_tqdm, enum=enum)
+        return lambda f: parallelize(f, **kwargs)
+
+    if n_threads is None:
+        n_threads = multiprocess.cpu_count()
+
+    # the idea behind this is that there might be some kind of object that is repeatedly used in the for loop
+    # to prevent race conditions and memory locks, we chunk the data and pass deep copies of the object to each thread
+    # this isn't done yet!!! been having issues testing it...
+    if use_chunks:
+
+        if use_tqdm:
+            global pbars
+            pbars = []
+            for i in range(n_threads):
+                pbars.append(tqdm(position=i, desc=f'Thread {i:<3}', leave=False))
+
+        def operation(operation_data):
+            chunk_i, lst = operation_data
+            res = []
+
+            if enum:
+                lst = [(i,el) for i,el in enumerate(lst)]
+
+            data = setup_func()
+            lst = [(el,data) for i,el in enumerate(lst)]
+
+            if use_tqdm:
+                pbars[chunk_i].total = len(lst)
+
+            for el in lst:
+                res.append(func(el))
+                if use_tqdm:
+                    pbars[chunk_i].update()
+
+            return res
+
+        @wraps(func)
+        def wrapper(data: list):
+
+            with multiprocess.Pool(n_threads) as pool:
+                arg_list = list(chunks(data, n_threads))
+                arg_list = [(i,el) for i,el in enumerate(arg_list)] # get the chunk numbers (not enumerate)
+
+                res = list(istarmap(pool, operation,  arg_list))
+                res = [r for rs in res for r in rs] # flatten the list
+
+            return res
+
+        return wrapper
 
     @wraps(func)
     def wrapper(data: list):
 
         with multiprocess.Pool(n_threads) as pool:
-            if enum:
-                arg_list = [(i,el) for i,el in enumerate(data)]
-            else:
-                arg_list = data
+            if enum: 
+                data = [(i,el) for i,el in enumerate(data)]
 
-            res = list(istarmap(pool, func, arg_list, data_len=len(arg_list), use_tqdm=use_tqdm))
+            res = list(istarmap(pool, func, data, use_tqdm=use_tqdm))
 
         return res
     return wrapper
 
-def istarmap(pool, func: function, data: list, chunksize: int = 1, use_tqdm: bool = False, data_len: int = None):
+
+def chunks(l, n):
+    for i in range(0, n):
+        yield l[i::n]
+
+def istarmap(pool, func: function, data: list, chunksize: int = 1, use_tqdm: bool = False):
     """
     function that combines of imap and starmap
 
@@ -52,7 +110,7 @@ def istarmap(pool, func: function, data: list, chunksize: int = 1, use_tqdm: boo
     """
 
     if use_tqdm:
-        res = tqdm(pool.imap(func, data, chunksize), total=data_len)
+        res = tqdm(pool.imap(func, data, chunksize), total=len(data))
     else:
         res = pool.imap(func, data, chunksize)
     
